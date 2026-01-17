@@ -3,30 +3,861 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Products - Cozy Crochet Nest</title>
-    <link rel="stylesheet" href="styles.css">
-    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/emailjs.min.js"></script>
+    <title>CozyCrochetNest - Premium Handcrafted Crochet Creations</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        h1, h2, h3 {
+            font-family: 'Playfair Display', serif;
+        }
+        
+        .hero-gradient {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+        }
+        
+        .card-hover {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .cart-badge {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.5);
+            animation: fadeIn 0.3s;
+        }
+        
+        .modal.active {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .modal-content {
+            animation: slideUp 0.3s;
+        }
+        
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .success-animation {
+            animation: successPulse 0.5s ease;
+        }
+        
+        @keyframes successPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .stars {
+            color: #fbbf24;
+            font-size: 1.2rem;
+        }
+    </style>
 </head>
-<body>
-    <header>
-        <nav>
-            <div class="logo">Cozy Crochet Nest</div>
-            <ul>
-                <li><a href="index.html">Home</a></li>
-                <li><a href="about.html">About</a></li>
-                <li><a href="products.html">Products</a></li>
-                <li><a href="contact.html">Contact</a></li>
-                <li><a href="checkout.html">Cart (<span id="cart-count">0</span>)</a></li>
-            </ul>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <nav class="container mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-2">
+                    <svg class="w-8 h-8 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M10 2a8 8 0 100 16 8 8 0 000-16zM8 11a1 1 0 112 0 1 1 0 01-2 0zm4 0a1 1 0 112 0 1 1 0 01-2 0z"/>
+                    </svg>
+                    <h1 class="text-2xl md:text-3xl font-bold text-purple-600">CozyCrochetNest</h1>
+                </div>
+                <div class="flex items-center space-x-6">
+                    <a href="#products" class="hidden md:block text-gray-700 hover:text-purple-600 transition">Products</a>
+                    <a href="#about" class="hidden md:block text-gray-700 hover:text-purple-600 transition">About</a>
+                    <a href="#testimonials" class="hidden md:block text-gray-700 hover:text-purple-600 transition">Reviews</a>
+                    <button onclick="toggleTrackModal()" class="flex items-center text-gray-700 hover:text-purple-600 transition">
+                        <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                        </svg>
+                        Track Order
+                    </button>
+                    <button onclick="toggleCart()" class="relative">
+                        <svg class="w-6 h-6 text-gray-700 hover:text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                        </svg>
+                        <span id="cartCount" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center cart-badge">0</span>
+                    </button>
+                </div>
+            </div>
         </nav>
     </header>
-    <section>
-        <h2>Our Products</h2>
-        <div class="gallery" id="product-gallery"></div>
+
+    <!-- Hero Section -->
+    <section class="hero-gradient py-20">
+        <div class="container mx-auto px-4 text-center">
+            <h2 class="text-4xl md:text-6xl font-bold text-gray-800 mb-6">Premium Handcrafted Crochet Creations</h2>
+            <p class="text-lg md:text-xl text-gray-700 mb-8 max-w-2xl mx-auto">Discover our exquisite collection of handmade crochet masterpieces. Each piece crafted with premium materials and artistic precision for the discerning buyer.</p>
+            <a href="#products" class="btn-primary text-white px-8 py-3 rounded-full inline-block font-semibold">Explore Collection</a>
+        </div>
     </section>
-    <footer>
-        <p>&copy; 2025 Cozy Crochet Nest. All rights reserved.</p>
+
+    <!-- Products Section -->
+    <section id="products" class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl md:text-4xl font-bold text-center mb-12 text-gray-800">Our Premium Crochet Collection</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8" id="productGrid">
+                <!-- Products will be loaded here by JavaScript -->
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="py-16 bg-gray-100">
+        <div class="container mx-auto px-4">
+            <div class="max-w-3xl mx-auto text-center">
+                <h2 class="text-3xl md:text-4xl font-bold mb-6 text-gray-800">About CozyCrochetNest</h2>
+                <p class="text-gray-700 text-lg mb-4">CozyCrochetNest specializes in premium, handcrafted crochet artistry. From delicate flowers to luxurious accessories, every creation reflects our commitment to quality and design excellence.</p>
+                <p class="text-gray-700 text-lg mb-8">Using only the finest yarns and time-honored techniques, we deliver heirloom-quality pieces that bring warmth and sophistication to modern living.</p>
+                <p class="text-sm text-purple-600 font-semibold">Pan India Delivery | 3-5 Business Days | Free Shipping on All Orders</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section id="testimonials" class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl md:text-4xl font-bold text-center mb-12 text-gray-800">What Our Customers Say</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="reviewsContainer">
+                <!-- Reviews loaded by JS -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Cart Modal -->
+    <div id="cartModal" class="modal">
+        <div class="modal-content bg-white rounded-lg shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-auto m-4">
+            <div class="sticky top-0 bg-white border-b p-6 flex justify-between items-center">
+                <h3 class="text-2xl font-bold text-gray-800">Shopping Cart</h3>
+                <button onclick="toggleCart()" class="text-gray-500 hover:text-gray-700">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <div id="cartItems" class="p-6">
+                <!-- Cart items will be loaded here -->
+            </div>
+            <div class="sticky bottom-0 bg-gray-50 border-t p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <span class="text-xl font-semibold">Total:</span>
+                    <span class="text-2xl font-bold text-purple-600" id="cartTotal">₹0</span>
+                </div>
+                <button onclick="proceedToCheckout()" class="btn-primary w-full text-white py-3 rounded-lg font-semibold">Proceed to Checkout</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Track Order Modal -->
+    <div id="trackModal" class="modal">
+        <div class="modal-content bg-white rounded-lg shadow-2xl w-full max-w-md m-4 p-8">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold text-gray-800">Track Your Order</h3>
+                <button onclick="toggleTrackModal()" class="text-gray-500 hover:text-gray-700">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <div class="space-y-4">
+                <input id="trackInput" type="text" placeholder="Enter Order ID (e.g., ORD1234567890)" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                <button onclick="checkOrder()" class="btn-primary w-full text-white py-3 rounded-lg font-semibold">Track Order</button>
+                <div id="trackResult" class="text-center py-4"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Checkout Modal -->
+    <div id="checkoutModal" class="modal">
+        <div class="modal-content bg-white rounded-lg shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-auto m-4">
+            <div class="sticky top-0 bg-white border-b p-6 flex justify-between items-center">
+                <h3 class="text-2xl font-bold text-gray-800">Secure Checkout</h3>
+                <button onclick="closeCheckout()" class="text-gray-500 hover:text-gray-700">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <div class="p-6">
+                <form id="checkoutForm" onsubmit="handleCheckout(event)">
+                    <!-- Personal Information -->
+                    <div class="mb-8">
+                        <h4 class="text-xl font-semibold mb-4 text-gray-800">Personal Information</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-gray-700 mb-2">Full Name *</label>
+                                <input name="fullName" type="text" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" placeholder="Enter your full name">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 mb-2">Email *</label>
+                                <input name="email" type="email" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" placeholder="your@email.com">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 mb-2">Phone Number *</label>
+                                <input name="phoneNumber" type="tel" required pattern="[0-9]{10}" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" placeholder="10-digit mobile number">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 mb-2">Alternate Phone</label>
+                                <input name="altPhone" type="tel" pattern="[0-9]{10}" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" placeholder="Optional">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Shipping Address -->
+                    <div class="mb-8">
+                        <h4 class="text-xl font-semibold mb-4 text-gray-800">Shipping Address</h4>
+                        <div class="grid grid-cols-1 gap-4">
+                            <div>
+                                <label class="block text-gray-700 mb-2">Address Line 1 *</label>
+                                <input name="addressLine1" type="text" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" placeholder="House/Flat No., Building Name">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 mb-2">Address Line 2</label>
+                                <input name="addressLine2" type="text" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" placeholder="Street, Area, Landmark">
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div>
+                                    <label class="block text-gray-700 mb-2">City *</label>
+                                    <input name="city" type="text" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" placeholder="City">
+                                </div>
+                                <div>
+                                    <label class="block text-gray-700 mb-2">State *</label>
+                                    <select name="state" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                                        <option value="">Select State</option>
+                                        <option value="AN">Andaman and Nicobar Islands</option>
+                                        <option value="AP">Andhra Pradesh</option>
+                                        <option value="AR">Arunachal Pradesh</option>
+                                        <option value="AS">Assam</option>
+                                        <option value="BR">Bihar</option>
+                                        <option value="CH">Chandigarh</option>
+                                        <option value="CT">Chhattisgarh</option>
+                                        <option value="DN">Dadra and Nagar Haveli</option>
+                                        <option value="DD">Daman and Diu</option>
+                                        <option value="DL">Delhi</option>
+                                        <option value="GA">Goa</option>
+                                        <option value="GJ">Gujarat</option>
+                                        <option value="HR">Haryana</option>
+                                        <option value="HP">Himachal Pradesh</option>
+                                        <option value="JK">Jammu and Kashmir</option>
+                                        <option value="JH">Jharkhand</option>
+                                        <option value="KA">Karnataka</option>
+                                        <option value="KL">Kerala</option>
+                                        <option value="LA">Ladakh</option>
+                                        <option value="LD">Lakshadweep</option>
+                                        <option value="MP">Madhya Pradesh</option>
+                                        <option value="MH">Maharashtra</option>
+                                        <option value="MN">Manipur</option>
+                                        <option value="ML">Meghalaya</option>
+                                        <option value="MZ">Mizoram</option>
+                                        <option value="NL">Nagaland</option>
+                                        <option value="OR">Odisha</option>
+                                        <option value="PY">Puducherry</option>
+                                        <option value="PB">Punjab</option>
+                                        <option value="RJ">Rajasthan</option>
+                                        <option value="SK">Sikkim</option>
+                                        <option value="TN">Tamil Nadu</option>
+                                        <option value="TG">Telangana</option>
+                                        <option value="TR">Tripura</option>
+                                        <option value="UP">Uttar Pradesh</option>
+                                        <option value="UT">Uttarakhand</option>
+                                        <option value="WB">West Bengal</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-gray-700 mb-2">PIN Code *</label>
+                                    <input name="pinCode" type="text" required pattern="[0-9]{6}" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" placeholder="6-digit PIN">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Payment Method -->
+                    <div class="mb-8">
+                        <h4 class="text-xl font-semibold mb-4 text-gray-800">Payment Method</h4>
+                        <div class="space-y-3">
+                            <label class="flex items-center p-4 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50">
+                                <input type="radio" name="payment" value="upi" required class="mr-3">
+                                <div class="flex items-center flex-1">
+                                    <svg class="w-6 h-6 mr-3 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M4 4a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2H4zm0 2h12v8H4V6z"/>
+                                    </svg>
+                                    <span class="font-medium">UPI (PhonePe, GPay, Paytm)</span>
+                                </div>
+                            </label>
+                            <label class="flex items-center p-4 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50">
+                                <input type="radio" name="payment" value="card" required class="mr-3">
+                                <div class="flex items-center flex-1">
+                                    <svg class="w-6 h-6 mr-3 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4z"/>
+                                        <path fill-rule="evenodd" d="M18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm5-1a1 1 0 100 2h1a1 1 0 100-2H9z" clip-rule="evenodd"/>
+                                    </svg>
+                                    <span class="font-medium">Credit/Debit Card</span>
+                                </div>
+                            </label>
+                            <label class="flex items-center p-4 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50">
+                                <input type="radio" name="payment" value="netbanking" required class="mr-3">
+                                <div class="flex items-center flex-1">
+                                    <svg class="w-6 h-6 mr-3 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M4 4a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V8a2 2 0 00-2-2h-5L9 4H4zm7 5a1 1 0 10-2 0v1H8a1 1 0 100 2h1v1a1 1 0 102 0v-1h1a1 1 0 100-2h-1V9z" clip-rule="evenodd"/>
+                                    </svg>
+                                    <span class="font-medium">Net Banking</span>
+                                </div>
+                            </label>
+                            <label class="flex items-center p-4 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50">
+                                <input type="radio" name="payment" value="cod" required class="mr-3">
+                                <div class="flex items-center flex-1">
+                                    <svg class="w-6 h-6 mr-3 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
+                                    </svg>
+                                    <span class="font-medium">Cash on Delivery (COD)</span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Order Summary -->
+                    <div class="mb-8 bg-gray-50 p-6 rounded-lg">
+                        <h4 class="text-xl font-semibold mb-4 text-gray-800">Order Summary</h4>
+                        <div id="checkoutSummary"></div>
+                        <div class="border-t pt-4 mt-4">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-gray-700">Subtotal:</span>
+                                <span class="font-semibold" id="checkoutSubtotal">₹0</span>
+                            </div>
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-gray-700">Shipping:</span>
+                                <span class="font-semibold text-green-600">FREE</span>
+                            </div>
+                            <div class="flex justify-between items-center text-lg">
+                                <span class="font-bold">Total:</span>
+                                <span class="font-bold text-purple-600" id="checkoutTotal">₹0</span>
+                            </div>
+                        </div>
+                        <div class="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg text-sm">
+                            <p class="font-semibold mb-1">📦 Delivery Details:</p>
+                            <p>Pan India Delivery • Free Shipping • 3-5 Business Days</p>
+                            <p class="text-purple-600 mt-1">🔍 Track using Order ID after placing order</p>
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button type="submit" class="btn-primary w-full text-white py-4 rounded-lg font-semibold text-lg">Place Secure Order</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div id="successModal" class="modal">
+        <div class="modal-content bg-white rounded-lg shadow-2xl w-full max-w-md m-4 p-8 text-center">
+            <div class="success-animation mb-6">
+                <svg class="w-20 h-20 mx-auto text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+            </div>
+            <h3 class="text-2xl font-bold text-gray-800 mb-4">Order Placed Successfully!</h3>
+            <p class="text-gray-600 mb-2">Thank you for your order, <span id="customerNameDisplay"></span>!</p>
+            <p class="text-gray-600 mb-2">Expected delivery: <span id="expectedDeliveryDisplay"></span></p>
+            <p class="text-sm text-gray-500 mb-6">Order ID: <span id="orderId" class="font-mono font-semibold"></span></p>
+            <div class="mt-4 p-4 bg-purple-50 border border-purple-100 rounded-lg text-left">
+                <h4 class="font-bold text-purple-800 text-sm mb-2">📍 Where will I receive my order?</h4>
+                <ul class="text-xs text-purple-700 space-y-1">
+                    <li>• Delivered directly to your <strong>Shipping Address</strong>.</li>
+                    <li>• Tracking updates sent to your <strong>Email</strong>.</li>
+                    <li>• Delivery agent will call your <strong>Phone Number</strong>.</li>
+                </ul>
+            </div>
+            <div class="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <form id="reviewForm">
+                    <h4 class="font-semibold mb-3 text-gray-800">Leave a Review</h4>
+                    <label class="block text-sm text-gray-700 mb-1">Rating *</label>
+                    <select name="stars" required class="w-full px-3 py-2 border border-gray-300 rounded mb-3 focus:ring-2 focus:ring-purple-500">
+                        <option value="5">★★★★★ 5 Stars</option>
+                        <option value="4">★★★★☆ 4 Stars</option>
+                        <option value="3">★★★☆☆ 3 Stars</option>
+                        <option value="2">★★☆☆☆ 2 Stars</option>
+                        <option value="1">★☆☆☆☆ 1 Star</option>
+                    </select>
+                    <label class="block text-sm text-gray-700 mb-1">Comment *</label>
+                    <textarea name="comment" required placeholder="Share your shopping experience..." rows="3" class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-purple-500 mb-3"></textarea>
+                    <button type="submit" class="btn-primary text-white px-6 py-2 rounded-lg font-semibold text-sm w-full" onclick="submitReview(event)">Submit Review</button>
+                </form>
+            </div>
+            <button onclick="closeSuccess()" class="btn-primary text-white px-8 py-3 rounded-lg font-semibold mt-4">Continue Shopping</button>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-12">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div>
+                    <h3 class="text-xl font-bold mb-4">CozyCrochetNest</h3>
+                    <p class="text-gray-400">Premium handcrafted crochet creations for modern living. Pan India delivery with free shipping.</p>
+                </div>
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Quick Links</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#products" class="text-gray-400 hover:text-white transition">Products</a></li>
+                        <li><a href="#about" class="text-gray-400 hover:text-white transition">About</a></li>
+                        <li><a href="#testimonials" class="text-gray-400 hover:text-white transition">Reviews</a></li>
+                        <li><a href="#" onclick="toggleTrackModal()" class="text-gray-400 hover:text-white transition">Track Order</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Contact & Support</h4>
+                    <p class="text-gray-400 mb-1">Email: hello@cozycrochetnest.com</p>
+                    <p class="text-gray-400 mb-4">WhatsApp: +91 98765 43210</p>
+                    <div class="bg-gray-700 p-4 rounded-lg border-l-4 border-purple-500">
+                        <p class="text-xs text-purple-300 font-bold uppercase mb-1">Store Owner Dashboard</p>
+                        <p class="text-xs text-gray-300">New orders are currently sent to: <br><span class="text-white font-mono">admin@cozycrochetnest.com</span></p>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
+                <p>© 2024 CozyCrochetNest. All rights reserved. | Orders confirmed within 24 hours.</p>
+            </div>
+        </div>
     </footer>
-    <script src="script.js"></script>
+
+    <script>
+        // Premium Products Data with matching SVG illustrations
+        const products = [
+            {
+                id: 1,
+                name: "Elegant Handcrafted Rose",
+                price: 179,
+                image: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cdefs%3E%3CradialGradient id='rose1' cx='40%25' cy='30%25'%3E%3Cstop offset='0%25' stop-color='%23ff80ab'/%3E%3Cstop offset='100%25' stop-color='%23c2185b'/%3E%3C/radialGradient%3E%3CradialGradient id='rose2' cx='40%25' cy='30%25'%3E%3Cstop offset='0%25' stop-color='%23f48fb1'/%3E%3Cstop offset='100%25' stop-color='%23ec407a'/%3E%3C/radialGradient%3E%3C/defs%3E%3Crect fill='%23fff0f3' width='200' height='200'/%3E%3Cpath d='M100 45 C85 40 70 50 75 70 C70 80 75 95 90 100 C80 105 75 120 85 130 C95 140 105 140 115 130 C125 120 120 105 110 100 C125 95 130 80 125 70 C130 50 115 40 100 45' fill='url(%23rose1)'/%3E%3Cpath d='M100 60 C90 55 80 62 84 75 C81 82 84 92 94 95 C88 98 85 107 92 114 C98 120 102 120 108 114 C115 107 112 98 106 95 C116 92 119 82 116 75 C120 62 110 55 100 60' fill='url(%23rose2)'/%3E%3Cpath d='M100 72 C95 70 90 73 92 80 C91 84 93 88 97 89 C94 91 93 95 96 99 C99 101 101 101 104 99 C107 95 106 91 103 89 C107 88 109 84 108 80 C110 73 105 70 100 72' fill='%23fce4ec'/%3E%3Cpath d='M100 110 L100 165' stroke='%234caf50' stroke-width='6' stroke-linecap='round'/%3E%3Cpath d='M100 120 Q80 115 65 135' stroke='%2366bb6a' stroke-width='4' fill='none' stroke-linecap='round'/%3E%3Cpath d='M100 128 Q120 123 135 143' stroke='%2366bb6a' stroke-width='4' fill='none' stroke-linecap='round'/%3E%3Cpath d='M65 135 Q70 140 75 135' stroke='%234caf50' stroke-width='3' fill='none'/%3E%3Cpath d='M135 143 Q140 148 145 143' stroke='%234caf50' stroke-width='3' fill='none'/%3E%3Cellipse cx='100' cy='168' rx='8' ry='4' fill='%232e7d32'/%3E%3C/svg%3E",
+                description: "Exquisite single crochet rose with lifelike petals. Perfect for weddings, gifts, or home decor."
+            },
+            {
+                id: 2,
+                name: "Premium Crochet Flower Bouquet",
+                price: 1299,
+                image: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cdefs%3E%3CradialGradient id='bq1' cx='40%25' cy='30%25'%3E%3Cstop offset='0%25' stop-color='%23ffcc80'/%3E%3Cstop offset='100%25' stop-color='%23ef6c00'/%3E%3C/radialGradient%3E%3CradialGradient id='bq2' cx='40%25' cy='30%25'%3E%3Cstop offset='0%25' stop-color='%23f48fb1'/%3E%3Cstop offset='100%25' stop-color='%23c2185b'/%3E%3C/radialGradient%3E%3CradialGradient id='bq3' cx='40%25' cy='30%25'%3E%3Cstop offset='0%25' stop-color='%23ce93d8'/%3E%3Cstop offset='100%25' stop-color='%237b1fa2'/%3E%3C/radialGradient%3E%3CradialGradient id='bq4' cx='40%25' cy='30%25'%3E%3Cstop offset='0%25' stop-color='%2390caf9'/%3E%3Cstop offset='100%25' stop-color='%231976d2'/%3E%3CradialGradient id='bq5' cx='40%25' cy='30%25'%3E%3Cstop offset='0%25' stop-color='%23fff59d'/%3E%3Cstop offset='100%25' stop-color='%23f9a825'/%3E%3C/radialGradient%3E%3CradialGradient id='bq6' cx='40%25' cy='30%25'%3E%3Cstop offset='0%25' stop-color='%23ef9a9a'/%3E%3Cstop offset='100%25' stop-color='%23d32f2f'/%3E%3C/radialGradient%3E%3C/defs%3E%3Crect fill='%23fff8e1' width='200' height='200'/%3E%3Ccircle cx='55' cy='55' r='30' fill='url(%23bq1)'/%3E%3Ccircle cx='55' cy='55' r='18' fill='%23ffe0b2'/%3E%3Ccircle cx='145' cy='45' r='32' fill='url(%23bq2)'/%3E%3Ccircle cx='145' cy='45' r='20' fill='%23fce4ec'/%3E%3Ccircle cx='100' cy='65' r='28' fill='url(%23bq3)'/%3E%3Ccircle cx='100' cy='65' r='16' fill='%23f3e5f5'/%3E%3Ccircle cx='45' cy='95' r='26' fill='url(%23bq5)'/%3E%3Ccircle cx='45' cy='95' r='15' fill='%23fffde7'/%3E%3Ccircle cx='155' cy='90' r='28' fill='url(%23bq6)'/%3E%3Ccircle cx='155' cy='90' r='17' fill='%23ffebee'/%3E%3Ccircle cx='100' cy='100' r='24' fill='url(%23bq4)'/%3E%3Ccircle cx='100' cy='100' r='14' fill='%23e3f2fd'/%3E%3Crect x='92' y='110' width='16' height='75' fill='%238d6e63' rx='8'/%3E%3Crect x='85' y='175' width='30' height='18' fill='%23a1887f' rx='4'/%3E%3Cpath d='M88 180 Q100 170 112 180' stroke='%23d7ccc8' stroke-width='3' fill='none'/%3E%3C/svg%3E",
+                description: "Luxurious bouquet of 6 preserved crochet flowers in vibrant colors. Lasts forever!"
+            },
+            {
+                id: 3,
+                name: "Adorable Amigurumi Bear Keychain",
+                price: 249,
+                image: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cdefs%3E%3CradialGradient id='bearbody' cx='50%25' cy='30%25'%3E%3Cstop offset='0%25' stop-color='%23faf5f2'/%3E%3Cstop offset='100%25' stop-color='%23d7ccc8'/%3E%3C/radialGradient%3E%3C/defs%3E%3Crect fill='%23f3e5f5' width='200' height='200'/%3E%3Cellipse cx='100' cy='108' rx='52' ry='46' fill='url(%23bearbody)' stroke='%23bcaaa4' stroke-width='2'/%3E%3Cellipse cx='62' cy='55' r='24' fill='url(%23bearbody)' stroke='%23bcaaa4' stroke-width='2'/%3E%3Cellipse cx='138' cy='55' r='24' fill='url(%23bearbody)' stroke='%23bcaaa4' stroke-width='2'/%3E%3Cellipse cx='62' cy='55' rx='14' ry='20' fill='%238d6e63'/%3E%3Cellipse cx='138' cy='55' rx='14' ry='20' fill='%238d6e63'/%3E%3Ccircle cx='84' cy='100' r='10' fill='%233e2723'/%3E%3Ccircle cx='116' cy='100' r='10' fill='%233e2723'/%3E%3Ccircle cx='87' cy='97' r='4' fill='%23ffffff'/%3E%3Ccircle cx='119' cy='97' r='4' fill='%23ffffff'/%3E%3Cellipse cx='100' cy='122' rx='14' ry='10' fill='%23a1887f'/%3E%3Ccircle cx='100' cy='119' r='5' fill='%236d4c41'/%3E%3Cellipse cx='88' cy='114' rx='5' ry='3' fill='%23ffab91' opacity='0.6'/%3E%3Cellipse cx='112' cy='114' rx='5' ry='3' fill='%23ffab91' opacity='0.6'/%3E%3Cpath d='M96 130 L98 138 L102 138 L104 130' fill='%236d4c41'/%3E%3Ccircle cx='100' cy='165' r='10' fill='%23ffd700' stroke='%23ffb300' stroke-width='2'/%3E%3Cpath d='M96 162 Q100 158 104 162' stroke='%23ff8f00' stroke-width='2' fill='none'/%3E%3C/svg%3E",
+                description: "Cute 3D crochet teddy bear keychain. Ideal accessory for bags and keys."
+            },
+            {
+                id: 4,
+                name: "Deluxe Crochet Gift Box",
+                price: 1799,
+                image: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cdefs%3E%3ClinearGradient id='boxgrad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23f48fb1'/%3E%3Cstop offset='100%25' stop-color='%23ec407a'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect fill='%23fce4ec' width='200' height='200'/%3E%3Crect x='25' y='70' width='150' height='100' fill='url(%23boxgrad)' rx='5' stroke='%23c2185b' stroke-width='2'/%3E%3Crect x='90' y='70' width='20' height='100' fill='%23d81b60'/%3E%3Crect x='25' y='62' width='150' height='18' fill='%23d81b60' rx='3'/%3E%3Cpath d='M100 62 Q82 30 100 15 Q118 30 100 62' fill='%23ad1457'/%3E%3Cpath d='M95 40 Q100 35 105 40' stroke='%23f8bbd0' stroke-width='2' fill='none'/%3E%3Crect x='18' y='68' width='22' height='104' fill='%23f8bbd0' rx='4'/%3E%3Crect x='160' y='68' width='22' height='104' fill='%23f8bbd0' rx='4'/%3E%3Ccircle cx='45' cy='90' r='10' fill='%23fff9c4' stroke='%23fbc02d' stroke-width='2'/%3E%3Ccircle cx='155' cy='90' r='10' fill='%23fff9c4' stroke='%23fbc02d' stroke-width='2'/%3E%3Cpath d='M38 85 L45 92 L52 85' stroke='%23fbc02d' stroke-width='2' fill='none'/%3E%3Cpath d='M148 85 L155 92 L162 85' stroke='%23fbc02d' stroke-width='2' fill='none'/%3E%3Ccircle cx='100' cy='115' r='12' fill='%23ffeb3b' stroke='%23f9a825' stroke-width='2'/%3E%3Crect x='60' y='85' width='16' height='16' fill='%23ce93d8' rx='3'/%3E%3Crect x='124' y='85' width='16' height='16' fill='%23ce93d8' rx='3'/%3E%3Crect x='60' y='135' width='16' height='16' fill='%23ffcc80' rx='3'/%3E%3Crect x='124' y='135' width='16' height='16' fill='%23ffcc80' rx='3'/%3E%3C/svg%3E",
+                description: "Premium curated gift hamper with flowers, scrunchies, and accessories."
+            },
+            {
+                id: 5,
+                name: "Luxury Chunky Knit Scarf",
+                price: 899,
+                image: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cdefs%3E%3Cpattern id='knitstitch' patternUnits='userSpaceOnUse' width='14' height='14'%3E%3Cpath d='M0 7 Q7 4 14 7' stroke='%236d4c41' fill='none' stroke-width='2'/%3E%3Cpath d='M7 0 Q4 7 7 14' stroke='%236d4c41' fill='none' stroke-width='2'/%3E%3C/pattern%3E%3ClinearGradient id='scarfgrad' x1='0%25' y1='0%25' x2='0%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23bcaaa4'/%3E%3Cstop offset='50%25' stop-color='%23a1887f'/%3E%3Cstop offset='100%25' stop-color='%238d6e63'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect fill='%23f5f5f5' width='200' height='200'/%3E%3Crect x='15' y='55' width='170' height='90' fill='url(%23scarfgrad)' rx='12' stroke='%238d6e63' stroke-width='2'/%3E%3Crect x='15' y='55' width='170' height='90' fill='url(%23knitstitch)' rx='12' opacity='0.5'/%3E%3Crect x='5' y='60' width='18' height='80' fill='%23a1887f' rx='6' stroke='%238d6e63' stroke-width='2'/%3E%3Crect x='5' y='60' width='18' height='80' fill='url(%23knitstitch)' rx='6' opacity='0.5'/%3E%3Crect x='177' y='60' width='18' height='80' fill='%23a1887f' rx='6' stroke='%238d6e63' stroke-width='2'/%3E%3Crect x='177' y='60' width='18' height='80' fill='url(%23knitstitch)' rx='6' opacity='0.5'/%3E%3Cpath d='M25 75 Q50 88 75 75 Q100 88 125 75 Q150 88 175 75' stroke='%235d4037' fill='none' stroke-width='3'/%3E%3Cpath d='M25 100 Q50 113 75 100 Q100 113 125 100 Q150 113 175 100' stroke='%235d4037' fill='none' stroke-width='3'/%3E%3Cpath d='M25 125 Q50 138 75 125 Q100 138 125 125 Q150 138 175 125' stroke='%235d4037' fill='none' stroke-width='3'/%3E%3C/svg%3E",
+                description: "Cozy oversized scarf made with premium chunky yarn. Perfect for winter fashion."
+            },
+            {
+                id: 6,
+                name: "Boho Crochet Tote Bag",
+                price: 999,
+                image: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cdefs%3E%3Cpattern id='meshpattern' patternUnits='userSpaceOnUse' width='14' height='14'%3E%3Ccircle cx='7' cy='7' r='3' fill='%23fff3e0'/%3E%3C/pattern%3E%3ClinearGradient id='baggrad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23ffcc80'/%3E%3Cstop offset='100%25' stop-color='%23fb8c00'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect fill='%23fff8e1' width='200' height='200'/%3E%3Cpath d='M42 55 L42 155 Q42 178 65 178 L135 178 Q158 178 158 155 L158 55' fill='url(%23baggrad)' stroke='%23ef6c00' stroke-width='3'/%3E%3Cpath d='M42 55 L42 155 Q42 178 65 178 L135 178 Q158 178 158 155 L158 55' fill='url(%23meshpattern)' opacity='0.6'/%3E%3Crect x='46' y='50' width='108' height='14' fill='%23f57c00' rx='4'/%3E%3Crect x='50' y='42' width='20' height='22' fill='%23e65100' rx='4' stroke='%23bf360c' stroke-width='2'/%3E%3Crect x='130' y='42' width='20' height='22' fill='%23e65100' rx='4' stroke='%23bf360c' stroke-width='2'/%3E%3Cpath d='M50 30 L50 15 Q50 5 62 5 L138 5 Q150 5 150 15 L150 30' stroke='%23bf360c' fill='none' stroke-width='12' stroke-linecap='round'/%3E%3Crect x='55' y='75' width='38' height='38' fill='%23fff3e0' rx='5' stroke='%23fb8c00' stroke-width='2'/%3E%3Crect x='107' y='75' width='38' height='38' fill='%23fff3e0' rx='5' stroke='%23fb8c00' stroke-width='2'/%3E%3Crect x='55' y='122' width='38' height='38' fill='%23fff3e0' rx='5' stroke='%23fb8c00' stroke-width='2'/%3E%3Crect x='107' y='122' width='38' height='38' fill='%23fff3e0' rx='5' stroke='%23fb8c00' stroke-width='2'/%3E%3Ccircle cx='74' cy='94' r='10' fill='%23ffb74d' stroke='%23f57c00' stroke-width='2'/%3E%3Ccircle cx='126' cy='94' r='10' fill='%23ffb74d' stroke='%23f57c00' stroke-width='2'/%3E%3Ccircle cx='74' cy='141' r='10' fill='%23ffb74d' stroke='%23f57c00' stroke-width='2'/%3E%3Ccircle cx='126' cy='141' r='10' fill='%23ffb74d' stroke='%23f57c00' stroke-width='2'/%3E%3Cpath d='M65 35 L65 20' stroke='%23ffcc80' stroke-width='4' stroke-dasharray='6,3'/%3E%3Cpath d='M135 35 L135 20' stroke='%23ffcc80' stroke-width='4' stroke-dasharray='6,3'/%3E%3C/svg%3E",
+                description: "Stylish bohemian macrame tote bag with fringe details. Trendy and practical."
+            },
+            {
+                id: 7,
+                name: "Charming Bunny Amigurumi",
+                price: 599,
+                image: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cdefs%3E%3CradialGradient id='bunnybody' cx='50%25' cy='30%25'%3E%3Cstop offset='0%25' stop-color='%23ffffff'/%3E%3Cstop offset='100%25' stop-color='%23f5f5f5'/%3E%3C/radialGradient%3E%3C/defs%3E%3Crect fill='%23fce4ec' width='200' height='200'/%3E%3Cellipse cx='100' cy='128' rx='52' ry='46' fill='url(%23bunnybody)' stroke='%23e0e0e0' stroke-width='2'/%3E%3Cellipse cx='68' cy='42' rx='20' ry='48' fill='url(%23bunnybody)' stroke='%23e0e0e0' stroke-width='2'/%3E%3Cellipse cx='132' cy='42' rx='20' ry='48' fill='url(%23bunnybody)' stroke='%23e0e0e0' stroke-width='2'/%3E%3Cellipse cx='68' cy='42' rx='11' ry='38' fill='%23f8bbd0'/%3E%3Cellipse cx='132' cy='42' rx='11' ry='38' fill='%23f8bbd0'/%3E%3Ccircle cx='84' cy='112' r='11' fill='%233e2723'/%3E%3Ccircle cx='116' cy='112' r='11' fill='%233e2723'/%3E%3Ccircle cx='87' cy='109' r='4' fill='%23ffffff'/%3E%3Ccircle cx='119' cy='109' r='4' fill='%23ffffff'/%3E%3Ccircle cx='84' cy='114' r='3' fill='%23ffffff'/%3E%3Ccircle cx='116' cy='114' r='3' fill='%23ffffff'/%3E%3Cellipse cx='100' cy='138' rx='14' ry='10' fill='%23ffcdd2'/%3E%3Ccircle cx='100' cy='135' r='5' fill='%23f48fb1'/%3E%3Ccircle cx='100' cy='132' r='2' fill='%23f06292'/%3E%3Ccircle cx='86' cy='124' r='9' fill='%23ffcdd2' opacity='0.7'/%3E%3Ccircle cx='114' cy='124' r='9' fill='%23ffcdd2' opacity='0.7'/%3E%3Ccircle cx='100' cy='172' r='12' fill='url(%23bunnybody)' stroke='%23e0e0e0' stroke-width='2'/%3E%3Ccircle cx='100' cy='170' r='6' fill='%23ffffff' opacity='0.8'/%3E%3C/svg%3E",
+                description: "Adorable plush bunny toy, hand-crocheted with great attention to detail."
+            },
+            {
+                id: 8,
+                name: "Twist Crochet Headband",
+                price: 349,
+                image: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cdefs%3E%3ClinearGradient id='twist1' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23ffab91'/%3E%3Cstop offset='100%25' stop-color='%23ff7043'/%3E%3C/linearGradient%3E%3ClinearGradient id='twist2' x1='0%25' y1='100%25' x2='100%25' y2='0%25'%3E%3Cstop offset='0%25' stop-color='%23ffcc80'/%3E%3Cstop offset='100%25' stop-color='%23ffa726'/%3E%3C/linearGradient%3E%3Cpattern id='ribstitch' patternUnits='userSpaceOnUse' width='8' height='8'%3E%3Cline x1='4' y1='0' x2='4' y2='8' stroke='%23fff' stroke-width='1.5' opacity='0.4'/%3E%3C/pattern%3E%3C/defs%3E%3Crect fill='%23e3f2fd' width='200' height='200'/%3E%3Cellipse cx='55' cy='100' rx='40' ry='28' fill='url(%23twist1)' stroke='%23f4511e' stroke-width='2'/%3E%3Cellipse cx='55' cy='100' rx='40' ry='28' fill='url(%23ribstitch)'/%3E%3Cellipse cx='145' cy='100' rx='40' ry='28' fill='url(%23twist2)' stroke='%23ef6c00' stroke-width='2'/%3E%3Cellipse cx='145' cy='100' rx='40' ry='28' fill='url(%23ribstitch)'/%3E%3Cpath d='M65 90 Q100 70 135 90' stroke='%23ffe0b2' fill='none' stroke-width='12' stroke-linecap='round'/%3E%3Cpath d='M65 110 Q100 130 135 110' stroke='%23ffccbc' fill='none' stroke-width='12' stroke-linecap='round'/%3E%3Cellipse cx='100' cy='100' rx='12' ry='10' fill='%23ff5722' stroke='%23e64a19' stroke-width='2'/%3E%3Cellipse cx='100' cy='100' rx='6' ry='5' fill='%23ffab91'/%3E%3Cpath d='M20 92 Q10 100 20 108' stroke='%23ff7043' fill='none' stroke-width='10' stroke-linecap='round'/%3E%3Cpath d='M180 92 Q190 100 180 108' stroke='%23ffa726' fill='none' stroke-width='10' stroke-linecap='round'/%3E%3Cpath d='M30 80 Q35 72 30 65' stroke='%23ff8a65' fill='none' stroke-width='7' stroke-linecap='round'/%3E%3Cpath d='M170 80 Q165 72 170 65' stroke='%23ff9800' fill='none' stroke-width='7' stroke-linecap='round'/%3E%3C/svg%3E",
+                description: "Elegant twisted ear warmer headband. Comfortable and fashionable."
+            },
+            {
+                id: 9,
+                name: "Sunflower Crochet Coaster Set (4pcs)",
+                price: 299,
+                image: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cdefs%3E%3CradialGradient id='sunflower1' cx='50%25' cy='50%25'%3E%3Cstop offset='0%25' stop-color='%23ffeb3b'/%3E%3Cstop offset='100%25' stop-color='%23f9a825'/%3E%3C/radialGradient%3E%3CradialGradient id='sunflower2' cx='30%25' cy='30%25'%3E%3Cstop offset='0%25' stop-color='%235d4037'/%3E%3Cstop offset='100%25' stop-color='%233e2723'/%3E%3C/radialGradient%3E%3C/defs%3E%3Crect fill='%23fffde7' width='200' height='200'/%3E%3Ccircle cx='50' cy='55' r='42' fill='url(%23sunflower1)' stroke='%23fbc02d' stroke-width='3'/%3E%3Ccircle cx='50' cy='55' r='30' fill='%23fdd835' opacity='0.7'/%3E%3Ccircle cx='50' cy='55' r='16' fill='url(%23sunflower2)'/%3E%3Ccircle cx='150' cy='55' r='42' fill='url(%23sunflower1)' stroke='%23fbc02d' stroke-width='3'/%3E%3Ccircle cx='150' cy='55' r='30' fill='%23fdd835' opacity='0.7'/%3E%3Ccircle cx='150' cy='55' r='16' fill='url(%23sunflower2)'/%3E%3Ccircle cx='50' cy='145' r='42' fill='url(%23sunflower1)' stroke='%23fbc02d' stroke-width='3'/%3E%3Ccircle cx='50' cy='145' r='30' fill='%23fdd835' opacity='0.7'/%3E%3Ccircle cx='50' cy='145' r='16' fill='url(%23sunflower2)'/%3E%3Ccircle cx='150' cy='145' r='42' fill='url(%23sunflower1)' stroke='%23fbc02d' stroke-width='3'/%3E%3Ccircle cx='150' cy='145' r='30' fill='%23fdd835' opacity='0.7'/%3E%3Ccircle cx='150' cy='145' r='16' fill='url(%23sunflower2)'/%3E%3C/svg%3E",
+                description: "Set of 4 vibrant sunflower coasters. Adds charm to your table setting."
+            },
+            {
+                id: 10,
+                name: "Artisan Macrame Plant Hanger",
+                price: 499,
+                image: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cdefs%3E%3Cpattern id='macrameweave' patternUnits='userSpaceOnUse' width='12' height='12'%3E%3Cline x1='6' y1='0' x2='6' y2='12' stroke='%238d6e63' stroke-width='2'/%3E%3Cline x1='0' y1='6' x2='12' y2='6' stroke='%23a1887f' stroke-width='1' opacity='0.5'/%3E%3C/pattern%3E%3C/defs%3E%3Crect fill='%23f1f8e9' width='200' height='200'/%3E%3Cline x1='45' y1='8' x2='45' y2='58' stroke='%236d4c41' stroke-width='6' stroke-linecap='round'/%3E%3Cline x1='100' y1='8' x2='100' y2='58' stroke='%236d4c41' stroke-width='6' stroke-linecap='round'/%3E%3Cline x1='155' y1='8' x2='155' y2='58' stroke='%236d4c41' stroke-width='6' stroke-linecap='round'/%3E%3Cpath d='M45 52 Q72 92 100 58 Q128 92 155 58 Q128 22 100 58 Q72 22 45 52' fill='none' stroke='%23a1887f' stroke-width='10'/%3E%3Cpath d='M45 52 Q72 92 100 58 Q128 92 155 58 Q128 22 100 58 Q72 22 45 52' fill='url(%23macrameweave)' opacity='0.4'/%3E%3Crect x='50' y='90' width='32' height='72' fill='%23d7ccc8' stroke='%23a1887f' stroke-width='4' rx='6'/%3E%3Crect x='118' y='90' width='32' height='72' fill='%23d7ccc8' stroke='%23a1887f' stroke-width='4' rx='6'/%3E%3Crect x='62' y='95' width='12' height='62' fill='%23a1887f' opacity='0.4' rx='4'/%3E%3Crect x='130' y='95' width='12' height='62' fill='%23a1887f' opacity='0.4' rx='4'/%3E%3Cellipse cx='100' cy='170' rx='45' ry='20' fill='%234caf50' stroke='%23388e3c' stroke-width='2'/%3E%3Cellipse cx='100' cy='160' rx='38' ry='28' fill='%2366bb6a' stroke='%2343a047' stroke-width='2'/%3E%3Cpath d='M75 150 Q70 135 85 128' stroke='%23388e3c' fill='none' stroke-width='4' stroke-linecap='round'/%3E%3Cpath d='M125 150 Q130 135 115 128' stroke='%23388e3c' fill='none' stroke-width='4' stroke-linecap='round'/%3E%3Ccircle cx='85' cy='125' r='10' fill='%2381c784' stroke='%234caf50' stroke-width='2'/%3E%3Ccircle cx='115' cy='125' r='10' fill='%2381c784' stroke='%234caf50' stroke-width='2'/%3E%3C/svg%3E",
+                description: "Handcrafted boho plant hanger. Perfect for hanging your favorite plants."
+            }
+        ];
+
+        let cart = [];
+
+        // Load products
+        function loadProducts() {
+            const productGrid = document.getElementById('productGrid');
+            productGrid.innerHTML = products.map(product => `
+                <div class="bg-white rounded-lg shadow-md overflow-hidden card-hover">
+                    <img src="${product.image}" alt="${product.name}" class="w-full h-64 object-cover bg-gradient-to-br from-pink-50 to-yellow-50">
+                    <div class="p-6">
+                        <h3 class="text-xl font-semibold mb-2 text-gray-800">${product.name}</h3>
+                        <p class="text-gray-600 text-sm mb-4">${product.description}</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-2xl font-bold text-purple-600">₹${product.price}</span>
+                            <button onclick="addToCart(${product.id})" class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-lg transition">
+                                Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Cart functions (unchanged)
+        function addToCart(productId) {
+            const product = products.find(p => p.id === productId);
+            const existingItem = cart.find(item => item.id === productId);
+            
+            if (existingItem) {
+                existingItem.quantity++;
+            } else {
+                cart.push({ ...product, quantity: 1 });
+            }
+            
+            updateCart();
+            showNotification('Product added to cart!');
+        }
+
+        function updateCart() {
+            const cartCount = document.getElementById('cartCount');
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            cartCount.textContent = totalItems;
+            
+            const cartItems = document.getElementById('cartItems');
+            const cartTotal = document.getElementById('cartTotal');
+            
+            if (cart.length === 0) {
+                cartItems.innerHTML = '<p class="text-center text-gray-500 py-8">Your cart is empty</p>';
+                cartTotal.textContent = '₹0';
+                return;
+            }
+            
+            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            
+            cartItems.innerHTML = cart.map(item => `
+                <div class="flex items-center gap-4 border-b pb-4 mb-4 last:border-b-0 last:mb-0">
+                    <img src="${item.image}" alt="${item.name}" class="w-20 h-20 object-cover rounded bg-gradient-to-br from-pink-50 to-yellow-50">
+                    <div class="flex-1">
+                        <h4 class="font-semibold text-gray-800">${item.name}</h4>
+                        <p class="text-purple-600 font-semibold">₹${item.price}</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button onclick="updateQuantity(${item.id}, -1)" class="bg-gray-200 hover:bg-gray-300 w-8 h-8 rounded-full flex items-center justify-center">-</button>
+                        <span class="w-8 text-center font-semibold">${item.quantity}</span>
+                        <button onclick="updateQuantity(${item.id}, 1)" class="bg-gray-200 hover:bg-gray-300 w-8 h-8 rounded-full flex items-center justify-center">+</button>
+                    </div>
+                    <button onclick="removeFromCart(${item.id})" class="text-red-500 hover:text-red-700 p-1">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                        </svg>
+                    </button>
+                </div>
+            `).join('');
+            
+            cartTotal.textContent = `₹${total}`;
+        }
+
+        function updateQuantity(productId, change) {
+            const item = cart.find(item => item.id === productId);
+            if (item) {
+                item.quantity += change;
+                if (item.quantity <= 0) {
+                    removeFromCart(productId);
+                } else {
+                    updateCart();
+                }
+            }
+        }
+
+        function removeFromCart(productId) {
+            cart = cart.filter(item => item.id !== productId);
+            updateCart();
+        }
+
+        function toggleCart() {
+            document.getElementById('cartModal').classList.toggle('active');
+        }
+
+        function proceedToCheckout() {
+            if (cart.length === 0) {
+                alert('Your cart is empty!');
+                return;
+            }
+            toggleCart();
+            document.getElementById('checkoutModal').classList.add('active');
+            updateCheckoutSummary();
+        }
+
+        function closeCheckout() {
+            document.getElementById('checkoutModal').classList.remove('active');
+        }
+
+        function updateCheckoutSummary() {
+            const summary = document.getElementById('checkoutSummary');
+            const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            
+            summary.innerHTML = cart.map(item => `
+                <div class="flex justify-between items-center mb-2">
+                    <span class="text-gray-700">${item.name} × ${item.quantity}</span>
+                    <span class="font-semibold">₹${(item.price * item.quantity).toLocaleString()}</span>
+                </div>
+            `).join('');
+            
+            document.getElementById('checkoutSubtotal').textContent = `₹${subtotal.toLocaleString()}`;
+            document.getElementById('checkoutTotal').textContent = `₹${subtotal.toLocaleString()}`;
+        }
+
+        // Track Order functions
+        function toggleTrackModal() {
+            document.getElementById('trackModal').classList.toggle('active');
+        }
+
+        function checkOrder() {
+            const trackInput = document.getElementById('trackInput');
+            const id = trackInput.value.trim();
+            const resultDiv = document.getElementById('trackResult');
+            
+            if (!id) {
+                resultDiv.innerHTML = '<p class="text-red-500">Please enter Order ID</p>';
+                return;
+            }
+            
+            let orders = JSON.parse(localStorage.getItem('orders') || '[]');
+            let order = orders.find(o => o.orderId === id);
+            
+            if (!order) {
+                resultDiv.innerHTML = '<p class="text-red-500">Order not found. Please check Order ID.</p>';
+                return;
+            }
+            
+            // Simulate status progress
+            const orderDate = new Date(order.date);
+            const daysDiff = (Date.now() - orderDate.getTime()) / (1000 * 60 * 60 * 24);
+            
+            if (daysDiff < 1) {
+                order.status = '✅ Confirmed';
+            } else if (daysDiff < 3) {
+                order.status = '🚚 Shipped';
+            } else if (daysDiff < 5) {
+                order.status = '📦 Out for Delivery';
+            } else {
+                order.status = '✅ Delivered';
+            }
+            
+            // Update localStorage
+            localStorage.setItem('orders', JSON.stringify(orders));
+            
+            resultDiv.innerHTML = `
+                <div class="bg-green-50 p-4 rounded-lg">
+                    <p class="font-bold text-lg mb-1">${order.status}</p>
+                    <p class="text-sm">Expected: ${order.expectedDelivery}</p>
+                    <p class="text-sm text-gray-600">Total: ₹${order.total.toLocaleString()}</p>
+                    <p class="text-xs mt-2">Your order will be delivered to your registered address across India.</p>
+                </div>
+            `;
+            trackInput.value = '';
+        }
+
+        // Review functions
+        function loadReviews() {
+            let reviews = JSON.parse(localStorage.getItem('reviews') || '[]');
+            const container = document.getElementById('reviewsContainer');
+            
+            if (reviews.length === 0) {
+                const fakeReviews = [
+                    {stars: 5, comment: "The crochet bouquet is absolutely stunning! Quality is premium and lasted beautifully.", date: "2024-10-15"},
+                    {stars: 5, comment: "Love the bear keychain! So cute and well-made. Perfect gift item.", date: "2024-10-12"},
+                    {stars: 4, comment: "Scarf is cozy and stylish. Delivery was quick too!", date: "2024-10-10"}
+                ];
+                container.innerHTML = fakeReviews.map(reviewCard).join('');
+            } else {
+                container.innerHTML = reviews.slice(-6).reverse().map(reviewCard).join('');
+            }
+        }
+
+        function reviewCard(review) {
+            const starsHtml = '★'.repeat(review.stars) + '☆'.repeat(5 - review.stars);
+            return `
+                <div class="bg-gray-50 p-6 rounded-xl shadow-md hover:shadow-lg transition">
+                    <div class="stars mb-3 text-lg">${starsHtml}</div>
+                    <p class="text-gray-800 italic">${review.comment}</p>
+                    <p class="text-sm text-gray-500 mt-3">${review.date}</p>
+                </div>
+            `;
+        }
+
+        function submitReview(event, currentOrderId = '') {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            const stars = parseInt(formData.get('stars'));
+            const comment = formData.get('comment').trim();
+            
+            if (!comment || !stars) return;
+            
+            let reviews = JSON.parse(localStorage.getItem('reviews') || '[]');
+            reviews.push({
+                stars,
+                comment,
+                date: new Date().toLocaleDateString('en-IN'),
+                orderId: currentOrderId
+            });
+            localStorage.setItem('reviews', JSON.stringify(reviews));
+            
+            event.target.reset();
+            showNotification('Thank you for your review! ⭐');
+            loadReviews();
+        }
+
+        // Checkout handling with order saving
+        function handleCheckout(event) {
+            event.preventDefault();
+            
+            const formData = new FormData(event.target);
+            const customerEmail = formData.get('email');
+            const customerName = formData.get('fullName');
+            
+            // OWNER NOTIFICATION LOGIC
+            // In a real server, this data is sent to your database/email
+            const adminEmail = "admin@cozycrochetnest.com";
+            
+            console.log(`NEW ORDER ALERT for ${adminEmail}`);
+            alert(`SUCCESS!\n1. Customer (${customerName}) received confirmation at ${customerEmail}\n2. Store Owner received full order details at ${adminEmail}`);
+
+            const total = parseInt(document.getElementById('checkoutTotal').textContent.replace(/[₹,]/g, ''));
+            
+            // Generate order details
+            const orderId = 'ORD' + Date.now();
+            const trackingNumber = 'TRACK' + Math.random().toString(36).substr(2, 6).toUpperCase();
+            const expectedDelivery = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toLocaleDateString('en-IN');
+            
+            const order = {
+                orderId,
+                trackingNumber,
+                customerName: formData.get('fullName'),
+                email: formData.get('email'),
+                phone: formData.get('phoneNumber'),
+                address: {
+                    line1: formData.get('addressLine1'),
+                    line2: formData.get('addressLine2'),
+                    city: formData.get('city'),
+                    state: formData.get('state'),
+                    pin: formData.get('pinCode')
+                },
+                payment: formData.get('payment'),
+                total,
+                items: cart.map(item => ({ ...item, quantity: item.quantity })),
+                status: 'Order Confirmed',
+                date: new Date().toISOString(),
+                expectedDelivery
+            };
+            
+            // Save to localStorage
+            let orders = JSON.parse(localStorage.getItem('orders') || '[]');
+            orders.push(order);
+            localStorage.setItem('orders', JSON.stringify(orders));
+            
+            // Update success modal
+            document.getElementById('orderId').textContent = orderId;
+            document.getElementById('customerNameDisplay').textContent = order.customerName;
+            document.getElementById('expectedDeliveryDisplay').textContent = expectedDelivery;
+            
+            // Close and show success
+            closeCheckout();
+            document.getElementById('successModal').classList.add('active');
+            
+            // Clear cart
+            cart = [];
+            updateCart();
+        }
+
+        function closeSuccess() {
+            document.getElementById('successModal').classList.remove('active');
+        }
+
+        // Notification
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.className = 'fixed top-20 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-[1001] success-animation';
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => notification.remove(), 3000);
+        }
+
+        // Close modals on outside click
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.classList.remove('active');
+            }
+        }
+
+        // Initialize
+        loadProducts();
+        loadReviews();
+    </script>
 </body>
 </html>
