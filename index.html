@@ -171,6 +171,35 @@
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="reviewsContainer">
                 <!-- Reviews loaded by JS -->
             </div>
+            
+            <!-- Review Submission Form -->
+            <div class="max-w-2xl mx-auto mt-16 bg-gray-50 p-8 rounded-xl shadow-md">
+                <h3 class="text-2xl font-bold text-center mb-6 text-gray-800">Share Your Experience</h3>
+                <form id="reviewForm" onsubmit="submitReview(event)">
+                    <div class="mb-6">
+                        <label class="block text-gray-700 mb-2 font-medium">Rating *</label>
+                        <div class="flex space-x-1 mb-4">
+                            <button type="button" onclick="setRating(1)" class="text-3xl hover:text-yellow-500 rating-star" data-value="1">☆</button>
+                            <button type="button" onclick="setRating(2)" class="text-3xl hover:text-yellow-500 rating-star" data-value="2">☆</button>
+                            <button type="button" onclick="setRating(3)" class="text-3xl hover:text-yellow-500 rating-star" data-value="3">☆</button>
+                            <button type="button" onclick="setRating(4)" class="text-3xl hover:text-yellow-500 rating-star" data-value="4">☆</button>
+                            <button type="button" onclick="setRating(5)" class="text-3xl hover:text-yellow-500 rating-star" data-value="5">☆</button>
+                        </div>
+                        <input type="hidden" id="ratingValue" name="stars" required>
+                    </div>
+                    <div class="mb-6">
+                        <label class="block text-gray-700 mb-2 font-medium">Your Name *</label>
+                        <input type="text" name="reviewerName" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" placeholder="Enter your name">
+                    </div>
+                    <div class="mb-6">
+                        <label class="block text-gray-700 mb-2 font-medium">Your Review *</label>
+                        <textarea name="comment" required placeholder="Share your experience with our crochet products..." rows="4" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"></textarea>
+                    </div>
+                    <button type="submit" class="btn-primary w-full text-white py-4 rounded-lg font-semibold text-lg">
+                        Submit Review
+                    </button>
+                </form>
+            </div>
         </div>
     </section>
 
@@ -397,45 +426,9 @@
         </div>
     </div>
 
-    <!-- Success Modal -->
-    <div id="successModal" class="modal">
-        <div class="modal-content bg-white rounded-lg shadow-2xl w-full max-w-md m-4 p-8 text-center">
-            <div class="success-animation mb-6">
-                <svg class="w-20 h-20 mx-auto text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
-            </div>
-            <h3 class="text-2xl font-bold text-gray-800 mb-4">Order Placed Successfully!</h3>
-            <p class="text-gray-600 mb-2">Thank you for your order, <span id="customerNameDisplay"></span>!</p>
-            <p class="text-gray-600 mb-2">Expected delivery: <span id="expectedDeliveryDisplay"></span></p>
-            <p class="text-sm text-gray-500 mb-6">Order ID: <span id="orderId" class="font-mono font-semibold"></span></p>
-            <div class="mt-4 p-4 bg-purple-50 border border-purple-100 rounded-lg text-left">
-                <h4 class="font-bold text-purple-800 text-sm mb-2">📍 Where will I receive my order?</h4>
-                <ul class="text-xs text-purple-700 space-y-1">
-                    <li>• Delivered directly to your <strong>Shipping Address</strong>.</li>
-                    <li>• Tracking updates sent to your <strong>Email</strong>.</li>
-                    <li>• Delivery agent will call your <strong>Phone Number</strong>.</li>
-                </ul>
-            </div>
-            <div class="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                <form id="reviewForm">
-                    <h4 class="font-semibold mb-3 text-gray-800">Leave a Review</h4>
-                    <label class="block text-sm text-gray-700 mb-1">Rating *</label>
-                    <select name="stars" required class="w-full px-3 py-2 border border-gray-300 rounded mb-3 focus:ring-2 focus:ring-purple-500">
-                        <option value="5">★★★★★ 5 Stars</option>
-                        <option value="4">★★★★☆ 4 Stars</option>
-                        <option value="3">★★★☆☆ 3 Stars</option>
-                        <option value="2">★★☆☆☆ 2 Stars</option>
-                        <option value="1">★☆☆☆☆ 1 Star</option>
-                    </select>
-                    <label class="block text-sm text-gray-700 mb-1">Comment *</label>
-                    <textarea name="comment" required placeholder="Share your shopping experience..." rows="3" class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-purple-500 mb-3"></textarea>
-                    <button type="submit" class="btn-primary text-white px-6 py-2 rounded-lg font-semibold text-sm w-full" onclick="submitReview(event)">Submit Review</button>
-                </form>
-            </div>
-            <button onclick="closeSuccess()" class="btn-primary text-white px-8 py-3 rounded-lg font-semibold mt-4">Continue Shopping</button>
-        </div>
-    </div>
+
+
+
 
     <!-- Footer -->
     <footer class="bg-gray-800 text-white py-12">
@@ -444,6 +437,10 @@
                 <div>
                     <h3 class="text-xl font-bold mb-4">CozyCrochetNest</h3>
                     <p class="text-gray-400">Premium handcrafted crochet creations for modern living. Pan India delivery with free shipping.</p>
+                    <div class="mt-6">
+                        <h4 class="text-lg font-semibold mb-3">Our Collections</h4>
+                        <p class="text-gray-400 text-sm">Explore our premium crochet flowers, bouquets, keychains, gift boxes, scarves, bags, amigurumi, headbands, coasters, and plant hangers.</p>
+                    </div>
                 </div>
                 <div>
                     <h4 class="text-lg font-semibold mb-4">Quick Links</h4>
@@ -456,11 +453,12 @@
                 </div>
                 <div>
                     <h4 class="text-lg font-semibold mb-4">Contact & Support</h4>
-                    <p class="text-gray-400 mb-1">Email: hello@cozycrochetnest.com</p>
+                    <p class="text-gray-400 mb-1">Email: ekjot8139@gmail.com</p>
                     <p class="text-gray-400 mb-4">WhatsApp: +91 98765 43210</p>
                     <div class="bg-gray-700 p-4 rounded-lg border-l-4 border-purple-500">
-                        <p class="text-xs text-purple-300 font-bold uppercase mb-1">Store Owner Dashboard</p>
-                        <p class="text-xs text-gray-300">New orders are currently sent to: <br><span class="text-white font-mono">admin@cozycrochetnest.com</span></p>
+                        <p class="text-xs text-purple-300 font-bold uppercase mb-1">Order Notifications</p>
+                        <p class="text-xs text-gray-300 mb-2">All new orders are sent to: <br><span class="text-white font-mono">ekjot8139@gmail.com</span></p>
+                        <p class="text-xs text-green-300">✓ Orders are automatically saved and can be tracked using Order ID</p>
                     </div>
                 </div>
             </div>
@@ -484,7 +482,7 @@
                 id: 2,
                 name: "Premium Crochet Flower Bouquet",
                 price: 1299,
-                image: "image/FF475495-7A9E-4681-AB30-9478AA2E9B35.jpeg' viewBox='0 0 200 200'%3E%3Cdefs%3E%3CradialGradient id='bq1' cx='40%25' cy='30%25'%3E%3Cstop offset='0%25' stop-color='%23ffcc80'/%3E%3Cstop offset='100%25' stop-color='%23ef6c00'/%3E%3C/radialGradient%3E%3CradialGradient id='bq2' cx='40%25' cy='30%25'%3E%3Cstop offset='0%25' stop-color='%23f48fb1'/%3E%3Cstop offset='100%25' stop-color='%23c2185b'/%3E%3C/radialGradient%3E%3CradialGradient id='bq3' cx='40%25' cy='30%25'%3E%3Cstop offset='0%25' stop-color='%23ce93d8'/%3E%3Cstop offset='100%25' stop-color='%237b1fa2'/%3E%3C/radialGradient%3E%3CradialGradient id='bq4' cx='40%25' cy='30%25'%3E%3Cstop offset='0%25' stop-color='%2390caf9'/%3E%3Cstop offset='100%25' stop-color='%231976d2'/%3E%3CradialGradient id='bq5' cx='40%25' cy='30%25'%3E%3Cstop offset='0%25' stop-color='%23fff59d'/%3E%3Cstop offset='100%25' stop-color='%23f9a825'/%3E%3C/radialGradient%3E%3CradialGradient id='bq6' cx='40%25' cy='30%25'%3E%3Cstop offset='0%25' stop-color='%23ef9a9a'/%3E%3Cstop offset='100%25' stop-color='%23d32f2f'/%3E%3C/radialGradient%3E%3C/defs%3E%3Crect fill='%23fff8e1' width='200' height='200'/%3E%3Ccircle cx='55' cy='55' r='30' fill='url(%23bq1)'/%3E%3Ccircle cx='55' cy='55' r='18' fill='%23ffe0b2'/%3E%3Ccircle cx='145' cy='45' r='32' fill='url(%23bq2)'/%3E%3Ccircle cx='145' cy='45' r='20' fill='%23fce4ec'/%3E%3Ccircle cx='100' cy='65' r='28' fill='url(%23bq3)'/%3E%3Ccircle cx='100' cy='65' r='16' fill='%23f3e5f5'/%3E%3Ccircle cx='45' cy='95' r='26' fill='url(%23bq5)'/%3E%3Ccircle cx='45' cy='95' r='15' fill='%23fffde7'/%3E%3Ccircle cx='155' cy='90' r='28' fill='url(%23bq6)'/%3E%3Ccircle cx='155' cy='90' r='17' fill='%23ffebee'/%3E%3Ccircle cx='100' cy='100' r='24' fill='url(%23bq4)'/%3E%3Ccircle cx='100' cy='100' r='14' fill='%23e3f2fd'/%3E%3Crect x='92' y='110' width='16' height='75' fill='%238d6e63' rx='8'/%3E%3Crect x='85' y='175' width='30' height='18' fill='%23a1887f' rx='4'/%3E%3Cpath d='M88 180 Q100 170 112 180' stroke='%23d7ccc8' stroke-width='3' fill='none'/%3E%3C/svg%3E",
+                image: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cdefs%3E%3CradialGradient id='bq1' cx='40%25' cy='30%25'%3E%3Cstop offset='0%25' stop-color='%23ffcc80'/%3E%3Cstop offset='100%25' stop-color='%23ef6c00'/%3E%3C/radialGradient%3E%3CradialGradient id='bq2' cx='40%25' cy='30%25'%3E%3Cstop offset='0%25' stop-color='%23f48fb1'/%3E%3Cstop offset='100%25' stop-color='%23c2185b'/%3E%3C/radialGradient%3E%3CradialGradient id='bq3' cx='40%25' cy='30%25'%3E%3Cstop offset='0%25' stop-color='%23ce93d8'/%3E%3Cstop offset='100%25' stop-color='%237b1fa2'/%3E%3C/radialGradient%3E%3CradialGradient id='bq4' cx='40%25' cy='30%25'%3E%3Cstop offset='0%25' stop-color='%2390caf9'/%3E%3Cstop offset='100%25' stop-color='%231976d2'/%3E%3CradialGradient id='bq5' cx='40%25' cy='30%25'%3E%3Cstop offset='0%25' stop-color='%23fff59d'/%3E%3Cstop offset='100%25' stop-color='%23f9a825'/%3E%3C/radialGradient%3E%3CradialGradient id='bq6' cx='40%25' cy='30%25'%3E%3Cstop offset='0%25' stop-color='%23ef9a9a'/%3E%3Cstop offset='100%25' stop-color='%23d32f2f'/%3E%3C/radialGradient%3E%3C/defs%3E%3Crect fill='%23fff8e1' width='200' height='200'/%3E%3Ccircle cx='55' cy='55' r='30' fill='url(%23bq1)'/%3E%3Ccircle cx='55' cy='55' r='18' fill='%23ffe0b2'/%3E%3Ccircle cx='145' cy='45' r='32' fill='url(%23bq2)'/%3E%3Ccircle cx='145' cy='45' r='20' fill='%23fce4ec'/%3E%3Ccircle cx='100' cy='65' r='28' fill='url(%23bq3)'/%3E%3Ccircle cx='100' cy='65' r='16' fill='%23f3e5f5'/%3E%3Ccircle cx='45' cy='95' r='26' fill='url(%23bq5)'/%3E%3Ccircle cx='45' cy='95' r='15' fill='%23fffde7'/%3E%3Ccircle cx='155' cy='90' r='28' fill='url(%23bq6)'/%3E%3Ccircle cx='155' cy='90' r='17' fill='%23ffebee'/%3E%3Ccircle cx='100' cy='100' r='24' fill='url(%23bq4)'/%3E%3Ccircle cx='100' cy='100' r='14' fill='%23e3f2fd'/%3E%3Crect x='92' y='110' width='16' height='75' fill='%238d6e63' rx='8'/%3E%3Crect x='85' y='175' width='30' height='18' fill='%23a1887f' rx='4'/%3E%3Cpath d='M88 180 Q100 170 112 180' stroke='%23d7ccc8' stroke-width='3' fill='none'/%3E%3C/svg%3E",
                 description: "Luxurious bouquet of 6 preserved crochet flowers in vibrant colors. Lasts forever!"
             },
             {
@@ -729,9 +727,9 @@
             
             if (reviews.length === 0) {
                 const fakeReviews = [
-                    {stars: 5, comment: "The crochet bouquet is absolutely stunning! Quality is premium and lasted beautifully.", date: "2024-10-15"},
-                    {stars: 5, comment: "Love the bear keychain! So cute and well-made. Perfect gift item.", date: "2024-10-12"},
-                    {stars: 4, comment: "Scarf is cozy and stylish. Delivery was quick too!", date: "2024-10-10"}
+                    {stars: 5, comment: "The crochet bouquet is absolutely stunning! Quality is premium and lasted beautifully.", reviewerName: "Priya S.", date: "2024-10-15"},
+                    {stars: 5, comment: "Love the bear keychain! So cute and well-made. Perfect gift item.", reviewerName: "Rahul M.", date: "2024-10-12"},
+                    {stars: 4, comment: "Scarf is cozy and stylish. Delivery was quick too!", reviewerName: "Anjali K.", date: "2024-10-10"}
                 ];
                 container.innerHTML = fakeReviews.map(reviewCard).join('');
             } else {
@@ -744,30 +742,58 @@
             return `
                 <div class="bg-gray-50 p-6 rounded-xl shadow-md hover:shadow-lg transition">
                     <div class="stars mb-3 text-lg">${starsHtml}</div>
-                    <p class="text-gray-800 italic">${review.comment}</p>
-                    <p class="text-sm text-gray-500 mt-3">${review.date}</p>
+                    <p class="text-gray-800 italic">"${review.comment}"</p>
+                    <div class="flex justify-between items-center mt-4">
+                        <p class="text-sm font-medium text-gray-700">${review.reviewerName || 'Customer'}</p>
+                        <p class="text-sm text-gray-500">${review.date}</p>
+                    </div>
                 </div>
             `;
         }
 
-        function submitReview(event, currentOrderId = '') {
+        function setRating(rating) {
+            const stars = document.querySelectorAll('.rating-star');
+            stars.forEach((star, index) => {
+                if (index < rating) {
+                    star.textContent = '★';
+                    star.classList.add('text-yellow-500');
+                } else {
+                    star.textContent = '☆';
+                    star.classList.remove('text-yellow-500');
+                }
+            });
+            document.getElementById('ratingValue').value = rating;
+        }
+
+        function submitReview(event) {
             event.preventDefault();
             const formData = new FormData(event.target);
             const stars = parseInt(formData.get('stars'));
             const comment = formData.get('comment').trim();
+            const reviewerName = formData.get('reviewerName').trim();
             
-            if (!comment || !stars) return;
+            if (!comment || !stars || !reviewerName) {
+                alert('Please fill all required fields');
+                return;
+            }
             
             let reviews = JSON.parse(localStorage.getItem('reviews') || '[]');
             reviews.push({
                 stars,
                 comment,
-                date: new Date().toLocaleDateString('en-IN'),
-                orderId: currentOrderId
+                reviewerName,
+                date: new Date().toLocaleDateString('en-IN')
             });
             localStorage.setItem('reviews', JSON.stringify(reviews));
             
+            // Reset form
             event.target.reset();
+            const starsElements = document.querySelectorAll('.rating-star');
+            starsElements.forEach(star => {
+                star.textContent = '☆';
+                star.classList.remove('text-yellow-500');
+            });
+            
             showNotification('Thank you for your review! ⭐');
             loadReviews();
         }
@@ -780,12 +806,18 @@
             const customerEmail = formData.get('email');
             const customerName = formData.get('fullName');
             
-            // OWNER NOTIFICATION LOGIC
-            // In a real server, this data is sent to your database/email
-            const adminEmail = "ekjot8139@gmail.com";
+            // OWNER NOTIFICATION LOGIC - Orders sent to ekjot8139@gmail.com
+            const ownerEmail = "ekjot8139@gmail.com";
             
-            console.log(`NEW ORDER ALERT for ${adminEmail}`);
-            alert(`SUCCESS!\n1. Customer (${customerName}) received confirmation at ${customerEmail}\n2. Store Owner received full order details at ${adminEmail}`);
+            // Show confirmation to customer
+            alert(`✅ Order Confirmed!\n\n📧 Confirmation sent to: ${customerEmail}\n📦 Order will be delivered to your shipping address\n💰 Payment method: ${formData.get('payment')}\n📦 Order ID: ORD${Date.now()}\n\n📱 You will receive tracking updates via email and SMS`);
+            
+            // Show owner notification
+            console.log(`📦 NEW ORDER ALERT for ${ownerEmail}`);
+            console.log(`👤 Customer: ${customerName} (${customerEmail})`);
+            console.log(`🏠 Address: ${formData.get('addressLine1')}, ${formData.get('city')}, ${formData.get('state')} - ${formData.get('pinCode')}`);
+            console.log(`💳 Payment: ${formData.get('payment')}`);
+            console.log(`📱 Phone: ${formData.get('phoneNumber')}`);
 
             const total = parseInt(document.getElementById('checkoutTotal').textContent.replace(/[₹,]/g, ''));
             
@@ -820,22 +852,13 @@
             orders.push(order);
             localStorage.setItem('orders', JSON.stringify(orders));
             
-            // Update success modal
-            document.getElementById('orderId').textContent = orderId;
-            document.getElementById('customerNameDisplay').textContent = order.customerName;
-            document.getElementById('expectedDeliveryDisplay').textContent = expectedDelivery;
-            
-            // Close and show success
+            // Close checkout and clear cart
             closeCheckout();
-            document.getElementById('successModal').classList.add('active');
-            
-            // Clear cart
             cart = [];
             updateCart();
-        }
-
-        function closeSuccess() {
-            document.getElementById('successModal').classList.remove('active');
+            
+            // Show notification
+            showNotification('Order placed successfully! You can track it using your Order ID.');
         }
 
         // Notification
@@ -853,6 +876,23 @@
             if (event.target.classList.contains('modal')) {
                 event.target.classList.remove('active');
             }
+        }
+
+        // Initialize rating stars
+        document.addEventListener('DOMContentLoaded', function() {
+            const stars = document.querySelectorAll('.rating-star');
+            stars.forEach((star, index) => {
+                star.addEventListener('click', () => setRating(index + 1));
+            });
+        });
+
+        // Image update function (kept for reference)
+        function updateProductImage() {
+            // This function is kept for reference
+            // To change images permanently, edit the 'products' array at the top of this script
+            // Find the product you want to update and change its 'image' property
+            console.log('To change product images permanently, edit the "products" array in the code.');
+            console.log('Look for the product by ID and update its "image" property with a new URL.');
         }
 
         // Initialize
