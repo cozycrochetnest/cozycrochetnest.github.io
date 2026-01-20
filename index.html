@@ -800,108 +800,48 @@ const products = [
         }
 
         // Checkout handling with order saving
-        function handleCheckout(event) {
-            event.preventDefault();
-            
-            const formData = new FormData(event.target);
-            const customerEmail = formData.get('email');
-            const customerName = formData.get('fullName');
-            
-            // OWNER NOTIFICATION LOGIC - Orders sent to ekjot8139@gmail.com
-            const ownerEmail = "ekjot8139@gmail.com";
-            
-            // Show confirmation to customer
-            alert(`✅ Order Confirmed!\n\n📧 Confirmation sent to: ${customerEmail}\n📦 Order will be delivered to your shipping address\n💰 Payment method: ${formData.get('payment')}\n📦 Order ID: ORD${Date.now()}\n\n📱 You will receive tracking updates via email and SMS`);
-            
-            // Show owner notification
-            console.log(`📦 NEW ORDER ALERT for ${ownerEmail}`);
-            console.log(`👤 Customer: ${customerName} (${customerEmail})`);
-            console.log(`🏠 Address: ${formData.get('addressLine1')}, ${formData.get('city')}, ${formData.get('state')} - ${formData.get('pinCode')}`);
-            console.log(`💳 Payment: ${formData.get('payment')}`);
-            console.log(`📱 Phone: ${formData.get('phoneNumber')}`);
+       function handleCheckout(event) {
+    event.preventDefault();
 
-            const total = parseInt(document.getElementById('checkoutTotal').textContent.replace(/[₹,]/g, ''));
-            
-            // Generate order details
-            const orderId = 'ORD' + Date.now();
-            const trackingNumber = 'TRACK' + Math.random().toString(36).substr(2, 6).toUpperCase();
-            const expectedDelivery = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toLocaleDateString('en-IN');
-            
-            const order = {
-                orderId,
-                trackingNumber,
-                customerName: formData.get('fullName'),
-                email: formData.get('email'),
-                phone: formData.get('phoneNumber'),
-                address: {
-                    line1: formData.get('addressLine1'),
-                    line2: formData.get('addressLine2'),
-                    city: formData.get('city'),
-                    state: formData.get('state'),
-                    pin: formData.get('pinCode')
-                },
-                payment: formData.get('payment'),
-                total,
-                items: cart.map(item => ({ ...item, quantity: item.quantity })),
-                status: 'Order Confirmed',
-                date: new Date().toISOString(),
-                expectedDelivery
-            };
-            
-            // Save to localStorage
-            let orders = JSON.parse(localStorage.getItem('orders') || '[]');
-            orders.push(order);
-            localStorage.setItem('orders', JSON.stringify(orders));
-            
-            // Close checkout and clear cart
-            closeCheckout();
+    const formData = new FormData(event.target);
+    const customerName = formData.get('fullName');
+    const customerEmail = formData.get('email');
+    const phone = formData.get('phoneNumber');
+    const payment = formData.get('payment');
+
+    const total = document.getElementById('checkoutTotal').textContent;
+
+    const itemsText = cart.map(item =>
+        `${item.name} x ${item.quantity} = ₹${item.price * item.quantity}`
+    ).join('\n');
+
+    const orderId = "ORD" + Date.now();
+
+    const templateParams = {
+        order_id: orderId,
+        customer_name: customerName,
+        customer_email: customerEmail,
+        phone: phone,
+        payment: payment,
+        items: itemsText,
+        total: total
+    };
+
+    emailjs.send("YOUR_SERVICE_ID", "YOUR_TEMPLATE_ID", templateParams)
+        .then(function(response) {
+            alert("✅ Order placed successfully!\nOrder ID: " + orderId);
+
+            // Clear cart
             cart = [];
             updateCart();
-            
-            // Show notification
-            showNotification('Order placed successfully! You can track it using your Order ID.');
-        }
-          // Prepare EmailJS payload
-            const itemsText = order.items
-                .map(i => `${i.name} x ${i.quantity} = ₹${i.price * i.quantity}`)
-                .join('\n');
 
-            const templateParams = {
-                to_owner_email: 'ekjot8139@gmail.com',
-                customer_name: order.customerName,
-                customer_email: order.email,
-                customer_phone: order.phone,
-                order_id: order.orderId,
-                tracking_number: order.trackingNumber,
-                payment_method: order.payment,
-                order_total: `₹${order.total.toLocaleString()}`,
-                expected_delivery: order.expectedDelivery,
-                address_line1: order.address.line1,
-                address_line2: order.address.line2 || '',
-                city: order.address.city,
-                state: order.address.state,
-                pin_code: order.address.pin,
-                items: itemsText
-            };
+            closeCheckout();
+        }, function(error) {
+            alert("❌ Email failed. But order placed.");
+            console.error("EmailJS Error:", error);
+        });
+}
 
-            // Send email via EmailJS
-            emailjs
-                .send('service_ums1goi', 'template_b88se5u', templateParams)
-                .then(function () {
-                    alert(`✅ Order Confirmed!\n\n📧 Confirmation sent to: ${customerEmail}\n📦 Order will be delivered to your shipping address\n💰 Payment method: ${order.payment}\n📦 Order ID: ${order.orderId}\n\n📱 You will receive tracking updates via email.`);
-                })
-                .catch(function (error) {
-                    console.error('EmailJS error:', error);
-                    alert(`✅ Order Confirmed, but email could not be sent automatically.\nOrder ID: ${order.orderId}\nYou can still track your order using this ID.`);
-                })
-                .finally(function () {
-                    // Close checkout and clear cart
-                    closeCheckout();
-                    cart = [];
-                    updateCart();
-                    showNotification('Order placed successfully! You can track it using your Order ID.');
-                });
-        }
 
         // Notification
         function showNotification(message) {
