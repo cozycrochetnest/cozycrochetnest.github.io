@@ -800,7 +800,7 @@ const products = [
         }
 
         // Checkout handling with order saving
-       function handleCheckout(event) {
+    function handleCheckout(event) {
     event.preventDefault();
 
     const formData = new FormData(event.target);
@@ -831,10 +831,8 @@ const products = [
         .then(function(response) {
             alert("✅ Order placed successfully!\nOrder ID: " + orderId);
 
-            // Clear cart
             cart = [];
             updateCart();
-
             closeCheckout();
         }, function(error) {
             alert("❌ Email failed. But order placed.");
