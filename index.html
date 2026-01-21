@@ -454,7 +454,7 @@
                 <div>
                     <h4 class="text-lg font-semibold mb-4">Contact & Support</h4>
                     <p class="text-gray-400 mb-1">Email: ekjot8139@gmail.com</p>
-                    <p class="text-gray-400 mb-4">WhatsApp: +91 9698635000</p>
+                    <p class="text-gray-400 mb-4">WhatsApp: +91 96986 35000</p>
                     <div class="bg-gray-700 p-4 rounded-lg border-l-4 border-purple-500">
                         <p class="text-xs text-purple-300 font-bold uppercase mb-1">Order Notifications</p>
                         <p class="text-xs text-gray-300 mb-2">All new orders are sent to: <br><span class="text-white font-mono">ekjot8139@gmail.com</span></p>
@@ -468,11 +468,19 @@
         </div>
     </footer>
 
+    <!-- EmailJS SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+
     <script>
-      // Premium Products Data
-const products = [
-    {
-        id: 1,
+        // Initialize EmailJS
+        (function(){
+            emailjs.init('2wWdBTA6gkKmTeiT2'); // Your real EmailJS Public Key
+        })();
+
+        // Premium Products Data with matching SVG illustrations
+        const products = [
+            {
+                id: 1,
         name: "Elegant Handcrafted Rose",
         price: 179,
         image: "images/rose.jpg",
@@ -542,8 +550,6 @@ const products = [
         description: "Handcrafted boho plant hanger. Perfect for hanging your favorite plants."
     }
 ];
-
-
         let cart = [];
 
         // Load products
@@ -799,47 +805,88 @@ const products = [
             loadReviews();
         }
 
-        // Checkout handling with order saving
-    function handleCheckout(event) {
-    event.preventDefault();
+        // Checkout handling with order saving + EmailJS
+        function handleCheckout(event) {
+            event.preventDefault();
+            
+            const formData = new FormData(event.target);
+            const customerEmail = formData.get('email');
+            const customerName = formData.get('fullName');
 
-    const formData = new FormData(event.target);
-    const customerName = formData.get('fullName');
-    const customerEmail = formData.get('email');
-    const phone = formData.get('phoneNumber');
-    const payment = formData.get('payment');
+            const total = parseInt(document.getElementById('checkoutTotal').textContent.replace(/[₹,]/g, ''));
+            
+            // Generate order details
+            const orderId = 'ORD' + Date.now();
+            const trackingNumber = 'TRACK' + Math.random().toString(36).substr(2, 6).toUpperCase();
+            const expectedDelivery = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toLocaleDateString('en-IN');
+            
+            const order = {
+                orderId,
+                trackingNumber,
+                customerName: formData.get('fullName'),
+                email: formData.get('email'),
+                phone: formData.get('phoneNumber'),
+                address: {
+                    line1: formData.get('addressLine1'),
+                    line2: formData.get('addressLine2'),
+                    city: formData.get('city'),
+                    state: formData.get('state'),
+                    pin: formData.get('pinCode')
+                },
+                payment: formData.get('payment'),
+                total,
+                items: cart.map(item => ({ ...item, quantity: item.quantity })),
+                status: 'Order Confirmed',
+                date: new Date().toISOString(),
+                expectedDelivery
+            };
+            
+            // Save to localStorage for tracking
+            let orders = JSON.parse(localStorage.getItem('orders') || '[]');
+            orders.push(order);
+            localStorage.setItem('orders', JSON.stringify(orders));
 
-    const total = document.getElementById('checkoutTotal').textContent;
+            // Prepare EmailJS payload
+            const itemsText = order.items
+                .map(i => `${i.name} x ${i.quantity} = ₹${i.price * i.quantity}`)
+                .join('\n');
 
-    const itemsText = cart.map(item =>
-        `${item.name} x ${item.quantity} = ₹${item.price * item.quantity}`
-    ).join('\n');
+            const templateParams = {
+                to_owner_email: 'ekjot8139@gmail.com',
+                customer_name: order.customerName,
+                customer_email: order.email,
+                customer_phone: order.phone,
+                order_id: order.orderId,
+                tracking_number: order.trackingNumber,
+                payment_method: order.payment,
+                order_total: `₹${order.total.toLocaleString()}`,
+                expected_delivery: order.expectedDelivery,
+                address_line1: order.address.line1,
+                address_line2: order.address.line2 || '',
+                city: order.address.city,
+                state: order.address.state,
+                pin_code: order.address.pin,
+                items: itemsText
+            };
 
-    const orderId = "ORD" + Date.now();
-
-    const templateParams = {
-        order_id: orderId,
-        customer_name: customerName,
-        customer_email: customerEmail,
-        phone: phone,
-        payment: payment,
-        items: itemsText,
-        total: total
-    };
-
-    emailjs.send("service_ums1goi", "template_b88se5u", templateParams)
-        .then(function(response) {
-            alert("✅ Order placed successfully!\nOrder ID: " + orderId);
-
-            cart = [];
-            updateCart();
-            closeCheckout();
-        }, function(error) {
-            alert("❌ Email failed. But order placed.");
-            console.error("EmailJS Error:", error);
-        });
-}
-
+            // Send email via EmailJS
+            emailjs
+                .send('service_ums1goi', 'template_b88se5u', templateParams)
+                .then(function () {
+                    alert(`✅ Order Confirmed!\n\n📧 Confirmation sent to: ${customerEmail}\n📦 Order will be delivered to your shipping address\n💰 Payment method: ${order.payment}\n📦 Order ID: ${order.orderId}\n\n📱 You will receive tracking updates via email.`);
+                })
+                .catch(function (error) {
+                    console.error('EmailJS error:', error);
+                    alert(`✅ Order Confirmed, but email could not be sent automatically.\nOrder ID: ${order.orderId}\nYou can still track your order using this ID.`);
+                })
+                .finally(function () {
+                    // Close checkout and clear cart
+                    closeCheckout();
+                    cart = [];
+                    updateCart();
+                    showNotification('Order placed successfully! You can track it using your Order ID.');
+                });
+        }
 
         // Notification
         function showNotification(message) {
